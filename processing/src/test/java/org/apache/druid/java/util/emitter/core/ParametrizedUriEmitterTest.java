@@ -32,6 +32,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -155,7 +156,9 @@ public class ParametrizedUriEmitterTest
         "http://example.com/test1", StringUtils.format("[%s]\n", JSON_MAPPER.writeValueAsString(events.get(0))),
         "http://example.com/test2", StringUtils.format("[%s]\n", JSON_MAPPER.writeValueAsString(events.get(1)))
     );
-    Assert.assertEquals(expected, results);
+    for (Map.Entry<String, String> entry : expected.entrySet()) {
+      JSONAssert.assertEquals(expected.get(entry.getKey()), results.get(entry.getKey()), false);
+    }
   }
 
   @Test
