@@ -38,10 +38,12 @@ import org.asynchttpclient.Response;
 import org.asynchttpclient.netty.EagerResponseBodyPart;
 import org.asynchttpclient.netty.NettyResponseStatus;
 import org.asynchttpclient.uri.Uri;
+import org.json.JSONException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -239,14 +241,19 @@ public class EmitterTest
                 "application/json",
                 request.getHeaders().get(HttpHeaders.Names.CONTENT_TYPE)
             );
-            Assert.assertEquals(
-                StringUtils.format(
-                    "[%s,%s]\n",
-                    JSON_MAPPER.writeValueAsString(events.get(0)),
-                    JSON_MAPPER.writeValueAsString(events.get(1))
-                ),
-                StandardCharsets.UTF_8.decode(request.getByteBufferData().slice()).toString()
-            );
+            try {
+              JSONAssert.assertEquals(
+                  StringUtils.format(
+                      "[%s,%s]\n",
+                      JSON_MAPPER.writeValueAsString(events.get(0)),
+                      JSON_MAPPER.writeValueAsString(events.get(1))
+                  ),
+                  StandardCharsets.UTF_8.decode(request.getByteBufferData().slice()).toString(),false
+              );
+
+            } catch (JSONException e) {
+              throw new RuntimeException(e);
+            }
 
             return GoHandlers.immediateFuture(okResponse());
           }
@@ -281,14 +288,18 @@ public class EmitterTest
                 "application/json",
                 request.getHeaders().get(HttpHeaders.Names.CONTENT_TYPE)
             );
-            Assert.assertEquals(
-                StringUtils.format(
-                    "[%s,%s]\n",
-                    JSON_MAPPER.writeValueAsString(events.get(0)),
-                    JSON_MAPPER.writeValueAsString(events.get(1))
-                ),
-                StandardCharsets.UTF_8.decode(request.getByteBufferData().slice()).toString()
-            );
+            try {
+              JSONAssert.assertEquals(
+                  StringUtils.format(
+                      "[%s,%s]\n",
+                      JSON_MAPPER.writeValueAsString(events.get(0)),
+                      JSON_MAPPER.writeValueAsString(events.get(1))
+                  ),
+                  StandardCharsets.UTF_8.decode(request.getByteBufferData().slice()).toString(), false
+              );
+            } catch (JSONException e) {
+              throw new RuntimeException(e);
+            }
 
             return GoHandlers.immediateFuture(okResponse());
           }
