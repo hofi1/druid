@@ -598,14 +598,18 @@ public class EmitterTest
             data.get(dataArray);
             CompressionUtils.gunzip(new ByteArrayInputStream(dataArray), baos);
 
-            Assert.assertEquals(
-                StringUtils.format(
-                    "[%s,%s]\n",
-                    JSON_MAPPER.writeValueAsString(events.get(0)),
-                    JSON_MAPPER.writeValueAsString(events.get(1))
-                ),
-                baos.toString(StandardCharsets.UTF_8.name())
-            );
+            try {
+              JSONAssert.assertEquals(
+                  StringUtils.format(
+                      "[%s,%s]\n",
+                      JSON_MAPPER.writeValueAsString(events.get(0)),
+                      JSON_MAPPER.writeValueAsString(events.get(1))
+                  ),
+                  baos.toString(StandardCharsets.UTF_8.name()), false
+              );
+            } catch (JSONException e) {
+              throw new RuntimeException(e);
+            }
 
             return GoHandlers.immediateFuture(okResponse());
           }
