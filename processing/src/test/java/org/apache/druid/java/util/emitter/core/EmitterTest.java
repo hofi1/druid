@@ -531,14 +531,18 @@ public class EmitterTest
                 "application/json",
                 request.getHeaders().get(HttpHeaders.Names.CONTENT_TYPE)
             );
-            Assert.assertEquals(
-                StringUtils.format(
-                    "[%s,%s]\n",
-                    JSON_MAPPER.writeValueAsString(events.get(counter.getAndIncrement())),
-                    JSON_MAPPER.writeValueAsString(events.get(counter.getAndIncrement()))
-                ),
-                StandardCharsets.UTF_8.decode(request.getByteBufferData().slice()).toString()
-            );
+            try {
+              JSONAssert.assertEquals(
+                  StringUtils.format(
+                      "[%s,%s]\n",
+                      JSON_MAPPER.writeValueAsString(events.get(counter.getAndIncrement())),
+                      JSON_MAPPER.writeValueAsString(events.get(counter.getAndIncrement()))
+                  ),
+                  StandardCharsets.UTF_8.decode(request.getByteBufferData().slice()).toString(), false
+              );
+            } catch (JSONException e) {
+              throw new RuntimeException(e);
+            }
 
             return GoHandlers.immediateFuture(okResponse());
           }
